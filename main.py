@@ -3,19 +3,18 @@ import requests
 import yfinance as yf
 
 def send_discord_message(message):
-    # 從保險箱讀取 Discord 網址
     webhook_url = os.environ.get("DISCORD_WEBHOOK_URL")
     if not webhook_url:
         print("⚠️ 找不到 DISCORD_WEBHOOK_URL，請檢查 GitHub 保險箱設定。")
         return
         
-    # Discord 規定的標準傳送內容格式 (json={"content": "你的文字"})
     payload = {"content": message}
     
     try:
         response = requests.post(webhook_url, json=payload, timeout=10)
-        # 【這裡已經修正】檢查 Discord 回傳的狀態碼是否為 200 或 204
-        if response.status_code in:
+        
+        # 【徹底改寫】完全不用中括號，改用最單純的等於判斷，繞過系統吞字的Bug
+        if response.status_code == 204 or response.status_code == 200:
             print("🔔 Discord 通知發送成功！")
         else:
             print(f"❌ 發送失敗，錯誤代碼: {response.status_code}，回應: {response.text}")
@@ -28,7 +27,6 @@ def check_usd_rate():
     print("=" * 60)
     
     try:
-        # 抓取最新美金匯率
         usd_twd = yf.Ticker("TWD=X")
         todays_data = usd_twd.history(period='1d')
         
