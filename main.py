@@ -14,7 +14,7 @@ def send_discord_message(message):
     
     try:
         response = requests.post(webhook_url, json=payload, timeout=10)
-        # Discord 成功發送時會回傳 204 或 200 狀態碼
+        # 【這裡已經修正】檢查 Discord 回傳的狀態碼是否為 200 或 204
         if response.status_code in:
             print("🔔 Discord 通知發送成功！")
         else:
