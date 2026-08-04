@@ -43,7 +43,7 @@ def check_usd_rate():
                 print(f"📊 目前匯率 ({rate:.4f}) 高於 {target_price} 元，不觸發通知。")
                 
                 # 測試開關：直接測試發送，讓你執行時能立刻在 Discord 看到漂亮結果
-                test_msg = f"✅ **【測試成功】** GitHub 自動測試程式執行正常！\n目前美金對台幣匯率為: **{rate:.4f}** （尚未低於 30 元）"
+                test_msg = f"@everyone✅ **【測試成功】** GitHub 自動測試程式執行正常！\n目前美金對台幣匯率為: **{rate:.4f}** （尚未低於 30 元）"
                 send_discord_message(test_msg)
                 
         else:
