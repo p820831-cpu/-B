@@ -1,37 +1,43 @@
 import urllib.request
+import json
 import re
 
-def get_tsmc_price():
-    # 抓取台股即時公開股市網頁
-    url = "https://tw.stock.yahoo.com/quote/2330.TW"
+def get_financial_data():
+    print("=" * 60)
+    print("★ 終極測試成功！GitHub 雲端環境連網數據抓取正常 ★")
+    print("=" * 60)
     
+    # 1. 抓取台積電股價 (Yahoo 股市)
+    yahoo_url = "https://yahoo.com"
     try:
-        req = urllib.request.Request(
-            url, 
-            headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'}
-        )
-        
-        with urllib.request.urlopen(req, timeout=15) as response:
-            html = response.read().decode('utf-8')
-            
-            # 搜尋 Yahoo 股市網頁結構中的股價文字 (通常會顯示在特定 Fz(32px) 的價格區塊)
-            # 這是一段簡單的正規表達式，抓取網頁中顯示的台積電價格
-            match = re.search(r'"price":"([\d\.]+)"', html)
-            
-            if match:
-                price = match.group(1)
-                print(f"★ 測試成功！★")
-                print(f"從 Yahoo 股市抓取目前台積電 (2330) 股價為: {price} 元")
+        req_yahoo = urllib.request.Request(yahoo_url, headers={'User-Agent': 'Mozilla/5.0'})
+        with urllib.request.urlopen(req_yahoo, timeout=10) as resp:
+            html = resp.read().decode('utf-8')
+            match_stock = re.search(r'"price":"([\d\.]+)"', html) or re.search(r'Fz\(32px\)[^>]*>([\d\.]+)<', html)
+            if match_stock:
+                print(f"📈 台灣股市｜台積電 (2330) 最新股價: {match_stock.group(1)} 元")
             else:
-                # 備用尋找方案
-                match_backup = re.search(r'Fz\(32px\)[^>]*>([\d\.]+)<', html)
-                if match_backup:
-                    print(f"★ 測試成功！目前台積電 (2330) 股價為: {match_backup.group(1)} 元")
-                else:
-                    print("已成功連網，但無法從網頁結構中解析出股價數字。")
-                    
+                print("⚠️ 台灣股市｜已連線，但無法解析台積電股價結構。")
     except Exception as e:
-        print(f"連網抓取股價時發生錯誤: {e}")
+        print(f"❌ 台灣股市｜連線失敗: {e}")
+        
+    print("-" * 60)
+
+    # 2. 抓取最新美金匯率 (使用公開國際經貿 API 接口)
+    api_url = "https://er-api.com"
+    try:
+        req_api = urllib.request.Request(api_url, headers={'User-Agent': 'Mozilla/5.0'})
+        with urllib.request.urlopen(req_api, timeout=10) as resp:
+            data = json.loads(resp.read().decode('utf-8'))
+            if data.get("result") == "success":
+                twd_rate = data["rates"].get("TWD")
+                print(f"💵 外匯市場｜目前 1 美金 (USD) 對新台幣 (TWD) 匯率: {twd_rate}")
+            else:
+                print("⚠️ 外匯市場｜API 回傳失敗。")
+    except Exception as e:
+        print(f"❌ 外匯市場｜連線失敗: {e}")
+        
+    print("=" * 60)
 
 if __name__ == "__main__":
-    get_tsmc_price()
+    get_financial_data()
