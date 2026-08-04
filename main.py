@@ -34,7 +34,7 @@ def check_usd_rate():
             rate = todays_data['Close'].iloc[-1]
             print(f"💵 當前美金對台幣匯率: {rate:.4f}")
             
-            target_price = 30.0
+            target_price = 35.0
             
             if rate < target_price:
                 msg = f"🚨 **【美金匯率警報】**\n目前美金匯率已跌破 {target_price} 元！\n當前最新匯率為: **{rate:.4f}** 📈"
