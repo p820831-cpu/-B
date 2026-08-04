@@ -1,9 +1,9 @@
 import os
-import urllib.request
-import json
+import requests
 import yfinance as yf
 
 def send_line_bot_message(message, channel_token, user_id):
+    # LINE 官方推播接口
     url = "https://line.me"
     
     headers = {
@@ -21,21 +21,22 @@ def send_line_bot_message(message, channel_token, user_id):
         ]
     }
     
-    data = json.dumps(payload).encode('utf-8')
-    
-    # 【關鍵修正】建立 Request 時，明確指定 method="POST"
-    req = urllib.request.Request(url, data=data, headers=headers, method="POST")
-    
     try:
-        with urllib.request.urlopen(req, timeout=10) as response:
-            if response.status == 200:
-                print("🔔 LINE Bot 通知發送成功！")
+        # 使用 requests.post 自動處理所有底層封裝，100% 確保為 POST 請求
+        response = requests.post(url, json=payload, headers=headers, timeout=10)
+        
+        if response.status_code == 200:
+            print("🔔 LINE Bot 通知發送成功！")
+        else:
+            print(f"❌ LINE Bot 發送失敗，錯誤代碼: {response.status_code}")
+            print(f"原始回傳內容: {response.text}")
+            
     except Exception as e:
-        print(f"❌ LINE Bot 通知發送失敗: {e}")
+        print(f"❌ 連線 LINE 發生異常錯誤: {e}")
 
 def check_usd_rate():
     print("=" * 60)
-    print("★ 自動匯率檢查程式啟動 (LINE Bot 版) ★")
+    print("★ 自動匯率檢查程式啟動 (LINE Bot requests版) ★")
     print("=" * 60)
     
     channel_token = os.environ.get("LINE_CHANNEL_ACCESS_TOKEN")
@@ -58,7 +59,7 @@ def check_usd_rate():
             else:
                 print(f"📊 目前匯率 ({rate:.4f}) 高於 {target_price} 元，不觸發通知。")
                 
-                # 測試開關：不論是否低於30元都發送一次，用來測試 LINE 能否正常收到
+                # 測試開關：直接測試發送
                 test_msg = f"✅ 測試成功！GitHub 目前美金匯率為: {rate:.4f}（這僅是測試訊息）"
                 if channel_token and user_id:
                     send_line_bot_message(test_msg, channel_token, user_id)
