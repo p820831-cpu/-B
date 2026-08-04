@@ -1,43 +1,41 @@
-import urllib.request
-import json
-import re
+import yfinance as yf
 
-def get_financial_data():
+def get_perfect_data():
     print("=" * 60)
-    print("★ 終極測試成功！GitHub 雲端環境連網數據抓取正常 ★")
+    print("★ 國際金融庫套件連線測試 ★")
     print("=" * 60)
     
-    # 1. 抓取台積電股價 (Yahoo 股市)
-    yahoo_url = "https://yahoo.com"
     try:
-        req_yahoo = urllib.request.Request(yahoo_url, headers={'User-Agent': 'Mozilla/5.0'})
-        with urllib.request.urlopen(req_yahoo, timeout=10) as resp:
-            html = resp.read().decode('utf-8')
-            match_stock = re.search(r'"price":"([\d\.]+)"', html) or re.search(r'Fz\(32px\)[^>]*>([\d\.]+)<', html)
-            if match_stock:
-                print(f"📈 台灣股市｜台積電 (2330) 最新股價: {match_stock.group(1)} 元")
-            else:
-                print("⚠️ 台灣股市｜已連線，但無法解析台積電股價結構。")
+        # 1. 抓取美金對台幣匯率 (代號: TWD=X)
+        usd_twd = yf.Ticker("TWD=X")
+        # 取得最新一筆交易數據
+        todays_data = usd_twd.history(period='1d')
+        if not todays_data.empty:
+            # Close 代表最新收盤/即時價
+            rate = todays_data['Close'].iloc[-1]
+            print(f"💵 國際匯市｜目前 1 美金對新台幣 (TWD) 匯率: {rate:.4f}")
+        else:
+            print("⚠️ 國際匯市｜目前非交易時段或暫無數據。")
+            
     except Exception as e:
-        print(f"❌ 台灣股市｜連線失敗: {e}")
+        print(f"❌ 國際匯市｜讀取失敗: {e}")
         
     print("-" * 60)
-
-    # 2. 抓取最新美金匯率 (使用公開國際經貿 API 接口)
-    api_url = "https://er-api.com"
+    
     try:
-        req_api = urllib.request.Request(api_url, headers={'User-Agent': 'Mozilla/5.0'})
-        with urllib.request.urlopen(req_api, timeout=10) as resp:
-            data = json.loads(resp.read().decode('utf-8'))
-            if data.get("result") == "success":
-                twd_rate = data["rates"].get("TWD")
-                print(f"💵 外匯市場｜目前 1 美金 (USD) 對新台幣 (TWD) 匯率: {twd_rate}")
-            else:
-                print("⚠️ 外匯市場｜API 回傳失敗。")
+        # 2. 抓取台積電美股 ADR (代號: TSM)，在國際上抓台積電最穩定
+        tsmc = yf.Ticker("TSM")
+        tsmc_data = tsmc.history(period='1d')
+        if not tsmc_data.empty:
+            price = tsmc_data['Close'].iloc[-1]
+            print(f"📈 國際股市｜台積電美股 ADR (TSM) 最新股價: {price:.2f} 美元")
+        else:
+            print("⚠️ 國際股市｜暫無台積電美股數據。")
+            
     except Exception as e:
-        print(f"❌ 外匯市場｜連線失敗: {e}")
+        print(f"❌ 國際股市｜讀取失敗: {e}")
         
     print("=" * 60)
 
 if __name__ == "__main__":
-    get_financial_data()
+    get_perfect_data()
