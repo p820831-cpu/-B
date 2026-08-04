@@ -1,7 +1,10 @@
 name: Run Rate Test
 
 on:
-  workflow_dispatch:
+  workflow_dispatch: # 保留手動測試按鈕
+  schedule:
+    # 每天台灣時間早上 9:05 自動檢查 (UTC 01:05)
+    - cron: '5 1 * * *'
 
 jobs:
   build:
@@ -19,4 +22,7 @@ jobs:
       run: pip install yfinance
         
     - name: 執行匯率測試
+      # env 區塊非常重要，它負責把 GitHub 保險箱的密鑰交給 Python 程式使用
+      env:
+        LINE_NOTIFY_TOKEN: ${{ secrets.LINE_NOTIFY_TOKEN }}
       run: python main.py
