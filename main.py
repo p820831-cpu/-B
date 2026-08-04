@@ -38,7 +38,7 @@ def check_usd_rate():
             print(f"💵 當前美金對台幣匯率: {rate:.4f}")
             
             # 設定你的觸發門檻：低於 30 元
-            target_price = 30.0
+            target_price = 35.0
             
             if rate < target_price:
                 msg = f"\n🚨 匯率警報！\n目前美金匯率已跌破 {target_price} 元！\n當前最新匯率為: {rate:.4f}"
