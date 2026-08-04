@@ -3,7 +3,7 @@ import json
 
 def get_usd_rate():
     # 更換為另一個免費且對 GitHub Actions 較友善的 API 來源
-    url = "https://exchangerate.host"
+    url = "https://er-api.com"
     
     # 備用 API 網址（如果上面那個也失敗，可以試試這行：https://er-api.com ）
     
